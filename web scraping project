@@ -1,0 +1,69 @@
+!pip install requests --upgrade
+import requests
+topic_url='https://github.com/topics'
+response=requests.get(topic_url)
+response.status_code
+len(response.text)
+contents=response.text
+page_contents=response.text
+page_contents[:1000]
+doc=BeautifulSoup(contents,'html.parser')
+p_tags=doc.find_all('p', {'class':'f3 lh-condensed mb-0 mt-1 Link--primary' })
+p_tags
+topic_desc=doc.find_all('p',{'class':'f5 color-fg-muted mb-0 mt-1'})
+topic_desc
+
+topic_link_tags=doc.find_all('a',{'class':'no-underline flex-1 d-flex flex-column'})
+len(topic_link_tags)
+url=topic_link_tags[0]['href']
+topic0_url="http://github.com"+ url
+print(topic0_url)
+def get_topic_titles(doc):
+    selection_class = 'f3 lh-condensed mb-0 mt-1 Link--primary'
+    topic_title_tags = doc.find_all('p', {'class': selection_class})
+    topic_titles = []
+    for tag in topic_title_tags:
+        topic_titles.append(tag.text)
+    return topic_titles
+ titles = get_topic_titles(doc)
+ def get_topic_descs(doc):
+    desc_selector = 'f5 color-fg-muted mb-0 mt-1'
+    topic_desc_tags = doc.find_all('p', {'class': desc_selector})
+    topic_descs = []
+    for tag in topic_desc_tags:
+        topic_descs.append(tag.text.strip())
+    return topic_descs
+  desc=get_topic_descs(doc)
+def get_topic_urls(doc):
+    topic_link_tags = doc.find_all('a', {'class': 'no-underline flex-1 d-flex flex-column'})
+    topic_urls = []
+    base_url = 'https://github.com'
+    for tag in topic_link_tags:
+        topic_urls.append(base_url + tag['href'])
+    return topic_urls
+  url=get_topic_urls(doc)
+  def scrape_topics():
+    topics_url = 'https://github.com/topics'
+    response = requests.get(topics_url)
+    if response.status_code != 200:
+        raise Exception('Failed to load page {}'.format(topic_url))
+    doc = BeautifulSoup(response.text, 'html.parser')
+    topics_dict = {
+        'title': get_topic_titles(doc),
+        'description': get_topic_descs(doc),
+        'url': get_topic_urls(doc)
+    }
+    return pd.DataFrame(topics_dict)
+ import pandas as pd
+
+dic={'title':titles,'description':desc,'url':url}
+topic_df=pd.DataFrame(dic)
+doc = get_topic_page('https://github.com/topics/3d')
+print(doc)
+def parse_star_count(stars):
+    stars=stars.strip()
+    if stars[-1]=='k':
+        return int(float(stars[:-1])*1000)
+    return(int(stars))
+str=parse_star_count
+print(str)
